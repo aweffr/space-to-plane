@@ -1,6 +1,6 @@
 from functools import total_ordering
-from .Vector import Vector
-from .Point import Point
+from space_to_plane.Vector import Vector
+from space_to_plane.Point import Point
 
 @total_ordering
 class Edge(object):
