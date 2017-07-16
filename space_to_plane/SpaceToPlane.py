@@ -15,7 +15,7 @@ def is_int(num):
 
 
 def get_left_most_point(point_map: dict):
-    """输入由空间到平面的解，遍历确定最左侧的点"""
+    """Get the most left point which both x and y are integer."""
     left_most_point = Point(INF, INF, 0)
     for point_space, point_plane in point_map.items():
         if is_int(point_plane.x) and is_int(point_plane.y) and point_plane.x < left_most_point.x:
@@ -231,16 +231,16 @@ class SpaceToPlane(object):
         return True
 
 
-def visualize_result(res: SpaceToPlane):
+def visualize_result(res: SpaceToPlane, *plot_args,**plot_kwargs):
     left_most_point = get_left_most_point(res.spaceToPlane)
     offset_vector = Vector(left_most_point, Point(1, 0, 0))
-    print("offset", offset_vector)
+    print("Move %r to %r", left_most_point, Point(1, 0, 0), "offset", offset_vector)
 
     for key in res.spaceToPlane.keys():
         point_plane = res.spaceToPlane[key]
         new_point_plane = point_plane + offset_vector
         res.spaceToPlane[key] = new_point_plane
-        plt.plot(new_point_plane.x, new_point_plane.y, "bo", alpha=(0.2 * random() + 0.5))
+        plt.plot(new_point_plane.x, new_point_plane.y, *plot_args, **plot_kwargs)
     plt.show()
 
 

@@ -5,5 +5,5 @@ G = ConstructGraph(filename="lines_40m.txt").G
 res = SpaceToPlane(G)
 res.run()
 
-visualize_result(res)
+visualize_result(res, "bo", alpha=0.6)
 output_result_to_file(res, "40m")
