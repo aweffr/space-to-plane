@@ -18,6 +18,7 @@ def get_left_most_point(point_map: dict):
     """Get the most left point which both x and y are integer."""
     left_most_point = Point(INF, INF, 0)
     for point_space, point_plane in point_map.items():
+        print("In get_left_most_point(),", point_plane.x)
         if is_int(point_plane.x) and is_int(point_plane.y) and point_plane.x < left_most_point.x:
             left_most_point = point_plane
     return left_most_point
@@ -42,7 +43,6 @@ class ConstructGraph(object):
             p1 = Point(*Point.parse_raw_data(raw1))
             p2 = Point(*Point.parse_raw_data(raw2))
             e = Edge(p1, p2)
-
             G[p1].add(e)
             G[p2].add(e)
 
@@ -115,14 +115,21 @@ class SpaceToPlane(object):
     def get_next_point(from_point: Point, edge: Edge) -> Point:
         """Input the current plane point and next edge, get the next point on plane"""
         assert from_point.z == 0, "Input Point should be on plane!(z == 0)"
+        length = edge.length
+        if abs(length - 0.25) < 0.001:
+            length = 0.25
+        if abs(length - 0.5) < 0.001:
+            length = 0.5
+        if abs(length - 1.0) < 0.001:
+            length = 1.0
         if edge.type == 0:
-            to_point = from_point + Vector.North(edge.length)
+            to_point = from_point + Vector.North(length)
         elif edge.type == 1:
-            to_point = from_point + Vector.East(edge.length)
+            to_point = from_point + Vector.East(length)
         elif edge.type == 2:
-            to_point = from_point + Vector.South(edge.length)
+            to_point = from_point + Vector.South(length)
         elif edge.type == 3:
-            to_point = from_point + Vector.West(edge.length)
+            to_point = from_point + Vector.West(length)
         else:
             raise Exception("Input Edge's type is wrong!")
         return to_point
@@ -194,6 +201,8 @@ class SpaceToPlane(object):
             for copied_edge in copied_around_edges:
                 if copied_edge == from_edge:
                     continue
+                if copied_edge.vec.length < 0.0001 or from_vector.length < 0.0001:
+                    continue
                 elif Vector.space_angle(copied_edge.vec, from_vector, degree=True) > 45:
                     vertical_edges.append(copied_edge)
                 else:  # angle <= 45
@@ -231,16 +240,22 @@ class SpaceToPlane(object):
         return True
 
 
-def visualize_result(res: SpaceToPlane, *plot_args,**plot_kwargs):
+def visualize_result(res: SpaceToPlane, *plot_args, **plot_kwargs):
     left_most_point = get_left_most_point(res.spaceToPlane)
+    print("left_most_point=%r" % left_most_point)
     offset_vector = Vector(left_most_point, Point(1, 0, 0))
-    print("Move %r to %r", left_most_point, Point(1, 0, 0), "offset", offset_vector)
+    print("Move %r to %r" % (left_most_point, Point(1, 0, 0)), "offset", offset_vector)
 
+    xx = []
+    yy = []
     for key in res.spaceToPlane.keys():
         point_plane = res.spaceToPlane[key]
         new_point_plane = point_plane + offset_vector
         res.spaceToPlane[key] = new_point_plane
-        plt.plot(new_point_plane.x, new_point_plane.y, *plot_args, **plot_kwargs)
+        xx.append(new_point_plane.x)
+        yy.append(new_point_plane.y)
+        # plt.plot(new_point_plane.x, new_point_plane.y, *plot_args, **plot_kwargs)
+    plt.plot(xx, yy, *plot_args, **plot_kwargs)
     plt.show()
 
 

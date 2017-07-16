@@ -9,6 +9,7 @@ from collections import defaultdict
 from pprint import pprint
 from math import floor, ceil
 import shelve
+import json
 
 point_list = []
 
@@ -107,33 +108,49 @@ def main(point_file, abaqus_file):
         for tmp_2D, tmp_3D, in_tmp in split(point_list):
             xBoundPoints.append(tmp_2D)
             xCoordPoints_3D.extend(tmp_3D)
-            inCoordPoints.extend(in_tmp)
-            inCoordPoints_3D.extend(in_tmp)
+            for p in in_tmp:
+                if abs(p[1]) == 12.0:
+                    continue
+                inCoordPoints.append(p)
+                inCoordPoints_3D.append(p)
 
     for point_list in y_dict.values():
         # tmp_2D = [point_list[0][:-1], point_list[-1][:-1]]
         # tmp_3D = [point_list[0], point_list[-1]]
         for tmp_2D, tmp_3D, in_tmp in split(point_list):
+            if abs(tmp_2D[0][1]) == 12.0:
+                continue
             yBoundPoints.append(tmp_2D)
             yCoordPoints_3D.extend(tmp_3D)
 
     f = shelve.open(abaqus_file)
-    f['mdbSaveName'] = abaqus_file.replace(".dat", "-mdb")
-    f['odbSaveName'] = abaqus_file.replace(".dat", "-odb")
-    f["time"] = 0
+    try:
+        f['mdbSaveName'] = abaqus_file.replace(".dat", "-mdb")
+        f['odbSaveName'] = abaqus_file.replace(".dat", "-odb")
+        f["time"] = 0
 
-    f["xCoordPoints"] = xBoundPoints
-    f["yCoordPoints"] = yBoundPoints
-    f["inCoordPoints"] = inCoordPoints
-    f["xCoordPoints_3D"] = xCoordPoints_3D
-    f["yCoordPoints_3D"] = yCoordPoints_3D
-    f["inCoordPoints_3D"] = inCoordPoints_3D
-    f["vector"] = vector
+        f["xCoordPoints"] = xBoundPoints
+        f["yCoordPoints"] = yBoundPoints
+        f["inCoordPoints"] = inCoordPoints
+        f["xCoordPoints_3D"] = xCoordPoints_3D
+        f["yCoordPoints_3D"] = yCoordPoints_3D
+        f["inCoordPoints_3D"] = inCoordPoints_3D
+        f["vector"] = vector
 
-    f.close()
+        d = dict(f)
+        with open(abaqus_file.replace(".dat", ".json"), "w") as json_file:
+            json_file.writelines(json.dumps(d) + "\n")
+    except Exception as e:
+        print("write output files failed. Exception:\n", e)
+    finally:
+        f.close()
 
 
 if __name__ == '__main__':
     import os
-    os.chdir("E:/SpaceToPlane/examples/40m")
-    main("40m-plane-points.txt", "40m-0.dat")
+
+    path_1 = "C:/Users/aweff/PycharmProjects/space-to-plane/examples/40m"
+    path_2 = "E:/SpaceToPlane/examples/40m"
+
+    os.chdir(path_1)
+    main("40m-250-plane-points.txt", "40m-250-0.dat")

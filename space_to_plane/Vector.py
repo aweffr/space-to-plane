@@ -41,6 +41,7 @@ class Vector(object):
     def space_angle(vector1, vector2, degree=False):
         x1, y1, z1 = vector1.dx, vector1.dy, vector1.dz
         x2, y2, z2 = vector2.dx, vector2.dy, vector2.dz
+
         cos_value = (x1 * x2 + y1 * y2 + z1 * z2) / (
             sqrt(x1 * x1 + y1 * y1 + z1 * z1) * sqrt(x2 * x2 + y2 * y2 + z2 * z2))
         rad = acos(cos_value)

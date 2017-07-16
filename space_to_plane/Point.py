@@ -36,10 +36,10 @@ class Point(object):
     @staticmethod
     def strip_acc(num):
         num = num + 0.0
-        num = "%.5f" % num
+        num = "%.7f" % num
         num = float(num)
 
-        if abs(round(num) - num) < 0.00005:
+        if abs(round(num) - num) < 0.00001:
             num = round(num)
         return num
 
@@ -47,6 +47,10 @@ class Point(object):
     def parse_raw_data(s):
         s = list(map(float, s.split(",")))
         return s[0], s[1], s[2]
+
+    @staticmethod
+    def point_from_raw(s: str):
+        return Point(*Point.parse_raw_data(s))
 
     @staticmethod
     def abs_distance(p1, p2):
